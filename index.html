@@ -347,6 +347,16 @@ body {
 .next-info .meta { font-size: 0.86rem; color: #5A6068; }
 .next-info .meta span { margin-right: 18px; }
 .next-actions { display: flex; flex-direction: column; gap: 12px; position: relative; z-index: 1; }
+.next-details {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 4px 18px;
+  margin-top: 16px;
+  font-size: 0.88rem;
+  text-align: left;
+}
+.next-details dt { font-weight: 700; color: var(--navy); }
+.next-details dd { color: #4A5058; }
 .countdown {
   margin-top: 14px;
   display: inline-flex;
@@ -362,6 +372,7 @@ body {
   .next-card { grid-template-columns: 1fr; text-align: center; }
   .next-date { border-right: none; border-bottom: 1px solid var(--line); padding: 0 0 24px; }
   .next-actions { flex-direction: row; justify-content: center; flex-wrap: wrap; }
+  .next-details { display: inline-grid; }
 }
 
 /* ---------- ABOUT (白) ---------- */
@@ -628,7 +639,7 @@ body {
     <a href="#about">部活紹介</a>
     <a href="#history">過去の開催</a>
     <a href="#links">リンク</a>
-    <a class="nav-cta" href="https://chouseisan.com/s?h=f5245b769ba74757a96282073a761ce0" target="_blank" rel="noopener">出欠登録</a>
+    <a class="nav-cta" data-chousei href="https://portal.bold.ne.jp/wiki/detail/16886" target="_blank" rel="noopener">出欠登録</a>
   </nav>
 </header>
 
@@ -676,10 +687,10 @@ body {
     <div class="about-grid">
       <div class="about-copy reveal">
         <h3>ラケットを握れば、<br><span class="marker">部署も役職も関係ない。</span></h3>
-        <p>ボールドバドミントン部は、月2回のペースで都内の体育館を借りて活動している社内サークルです。現場が違うエンジニア同士が顔を合わせられる、貴重な「リアルの接点」でもあります。</p>
-        <p>ガチ勢もエンジョイ勢も大歓迎。ラケットの貸し出しもあるので、手ぶら参加OKです。汗を流したあとの一杯まで含めて部活です。</p>
+        <p>ボールドバドミントン部は、月1回ほど、都内や川崎の体育館を借りて活動している社内サークルです。現場が違うエンジニア同士が顔を合わせられる、貴重な「リアルの接点」でもあります。</p>
+        <p>経験者は2〜3割ほどで、初心者や久しぶりの人も大歓迎。ラケットは貸し出すので、動きやすい服・室内シューズ・タオルがあれば参加できます。汗を流したあとの懇親会まで含めて部活です。</p>
         <div class="stats">
-          <div class="stat reveal reveal-delay-1"><div class="num"><span class="count" data-target="2">0</span><span class="unit">回/月</span></div><div class="label">活動頻度</div></div>
+          <div class="stat reveal reveal-delay-1"><div class="num"><span class="count" data-key="events" data-target="0">0</span><span class="unit">回</span></div><div class="label">開催実績</div></div>
         </div>
       </div>
       <div class="about-visual reveal reveal-delay-1">
@@ -720,10 +731,10 @@ body {
 <footer class="footer">
   <div class="footer-inner">
     <div class="footer-logo">BOLD<br>BADMINTON CLUB<span class="dot">.</span></div>
-    <div class="footer-note">株式会社ボールド 社内サークル / 活動は月2回・都内体育館にて</div>
+    <div class="footer-note">株式会社ボールド 社内サークル / 活動は月1回ほど・都内や川崎の体育館にて</div>
     <div class="footer-cta">
-      <a class="cta-chousei" href="https://chouseisan.com/s?h=f5245b769ba74757a96282073a761ce0" target="_blank" rel="noopener">
-        <span class="t">出欠登録<small>調整さんはこちら</small></span>
+      <a class="cta-chousei" data-chousei href="https://portal.bold.ne.jp/wiki/detail/16886" target="_blank" rel="noopener">
+        <span class="t">出欠登録<small>日程は掲示板で告知します</small></span>
         <span class="circ">→</span>
       </a>
       <a class="cta-board" href="https://portal.bold.ne.jp/wiki/detail/16886" target="_blank" rel="noopener">
@@ -759,7 +770,7 @@ body {
 </div>
 
 <!-- 右下固定の出欠バナー -->
-<a class="fixed-reserve" href="https://chouseisan.com/s?h=f5245b769ba74757a96282073a761ce0" target="_blank" rel="noopener">
+<a class="fixed-reserve" data-chousei href="https://portal.bold.ne.jp/wiki/detail/16886" target="_blank" rel="noopener" style="display: none;">
   <span class="t">出欠登録<small>調整さんはこちら</small></span>
   <span class="circ">＋</span>
 </a>
@@ -790,7 +801,7 @@ const CONFIG = {
     place: "○○区総合体育館 第2アリーナ",   // 会場名(ダミー)
     access: "△△線 ○○駅 徒歩5分",
     mapUrl: "https://maps.google.com/",     // 会場のGoogleマップURL
-    chouseisanUrl: "https://chouseisan.com/s?h=f5245b769ba74757a96282073a761ce0" // 今回の調整さんURL
+    chouseisanUrl: ""  // 今回の調整さんURL
   },
 
   // ---- 過去の開催場所 (新しい順に上へ追加してください) ----
@@ -813,7 +824,7 @@ const CONFIG = {
     {
       title: "出欠登録（調整さん）",
       desc: "次回の出欠はこちらから。参加・不参加どちらでも入力お願いします!",
-      url: "https://chouseisan.com/s?h=f5245b769ba74757a96282073a761ce0",  // 調整さん
+      url: "",  // 空のままでOK(次回開催の「調整さんURL」を自動で使う)
       style: "chousei"
     }
   ]
@@ -845,26 +856,31 @@ function observeReveals() {
 }
 
 // ---------- NEXT GAME 描画 ----------
+// 表示した開催の調整さんURLを返す(開催がなければ空文字)
 function renderNext(ev) {
   const card = document.getElementById("next-card");
-  if (!ev) {
-    // 未来の開催予定がないとき
-    const fallbackUrl = safeUrl(CONFIG.links[1] ? CONFIG.links[1].url : "");
+  // 日付が読めない・すでに過ぎている開催は「調整中」扱いにする(古い日付を出さないため)
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  const d = ev ? parseDate(ev.date) : null;
+  if (!d || d < today) {
     card.innerHTML = `
       <div class="next-info" style="grid-column: 1 / -1; text-align: center;">
         <div class="place">次回の開催は調整中です</div>
-        <div class="meta">日程が決まり次第ここに表示されます。調整さんもチェックしてください!</div>
+        <div class="meta">日程が決まったら、ここと社内ポータルの掲示板でお知らせします。</div>
         <div style="margin-top: 20px; display: flex; justify-content: center;">
-          <a class="btn btn-navy" href="${fallbackUrl}" target="_blank" rel="noopener">調整さんを開く <span class="circ">→</span></a>
+          <a class="btn btn-navy" href="${boardUrl()}" target="_blank" rel="noopener">掲示板を開く <span class="circ">→</span></a>
         </div>
       </div>`;
-    return;
+    return "";
   }
-  const d = parseDate(ev.date);
-  const today = new Date(); today.setHours(0, 0, 0, 0);
   const diffDays = Math.round((d - today) / 86400000);
-  const cd = diffDays > 0 ? `あと <b>${diffDays}</b> 日` : (diffDays === 0 ? "本日開催!" : "次回調整中");
-  const mapUrl = safeUrl(ev.mapUrl), chouseiUrl = safeUrl(ev.chouseisanUrl);
+  const cd = diffDays > 0 ? `あと <b>${diffDays}</b> 日` : "本日開催!";
+  const mapUrl = safeUrl(ev.mapUrl), chouseiUrl = safeUrl(ev.chouseisanUrl), noticeUrl = safeUrl(ev.noticeUrl);
+  const start = cleanTime(ev.startTime || ""), end = cleanTime(ev.endTime || "");
+  // 集合・参加費・懇親会は、シートに書いてある項目だけ表示
+  const details = [["集合", ev.meet], ["参加費", ev.fee], ["懇親会", ev.party]]
+    .filter(([, v]) => v && String(v).trim())
+    .map(([k, v]) => `<dt>${k}</dt><dd>${esc(v)}</dd>`).join("");
   card.innerHTML = `
     <div class="next-date">
       <div class="month">${d.getMonth() + 1}月</div>
@@ -874,20 +890,60 @@ function renderNext(ev) {
     <div class="next-info">
       <div class="place">${esc(ev.place)}</div>
       <div class="meta">
-        <span>🕕 ${esc(cleanTime(ev.startTime))} - ${esc(cleanTime(ev.endTime))}</span>
-        <span>🚉 ${esc(ev.access)}</span>
+        ${start ? `<span>🕕 ${esc(start)}${end ? ` - ${esc(end)}` : ""}</span>` : ""}
+        ${ev.access ? `<span>🚉 ${esc(ev.access)}</span>` : ""}
       </div>
+      ${details ? `<dl class="next-details">${details}</dl>` : ""}
       <div class="countdown">${cd}<small>開催まで</small></div>
     </div>
     <div class="next-actions">
       ${chouseiUrl ? `<a class="btn btn-navy" href="${chouseiUrl}" target="_blank" rel="noopener">出欠を登録する <span class="circ">→</span></a>` : ""}
+      ${noticeUrl ? `<a class="btn btn-ghost-ink" href="${noticeUrl}" target="_blank" rel="noopener">告知を読む <span class="circ">→</span></a>` : ""}
       ${mapUrl ? `<a class="btn btn-ghost-ink" href="${mapUrl}" target="_blank" rel="noopener">地図を見る <span class="circ">→</span></a>` : ""}
     </div>`;
+  return chouseiUrl;
+}
+
+// ---------- 掲示板のURL ----------
+function boardUrl() {
+  const board = CONFIG.links.find(l => l.style === "board");
+  return safeUrl(board ? board.url : "");
+}
+
+// ---------- 出欠リンク(ヘッダー・フッター・右下バナー)を次回の調整さんに合わせる ----------
+// 次回の調整さんURLがないときは掲示板へ飛ばし、右下バナーは隠す
+function updateChouseiLinks(url) {
+  document.querySelectorAll("[data-chousei]").forEach(a => { a.href = url || boardUrl(); });
+  const small = document.querySelector(".cta-chousei small");
+  if (small) small.textContent = url ? "調整さんはこちら" : "日程は掲示板で告知します";
+  const banner = document.querySelector(".fixed-reserve");
+  if (banner) banner.style.display = url ? "" : "none";
+}
+
+// ---------- 次回の開催をまとめて反映(カード・出欠リンク・リンク欄) ----------
+function showNext(ev) {
+  const url = renderNext(ev);
+  updateChouseiLinks(url);
+  renderLinks(url);
+}
+
+// ---------- 開催実績の数 ----------
+function setEventCount(n) {
+  const el = document.querySelector('.count[data-key="events"]');
+  if (!el) return;
+  el.dataset.target = n;
+  el.textContent = n;
 }
 
 // ---------- 過去の開催 描画 ----------
 function renderHistory(events) {
-  document.getElementById("history-list").innerHTML = events.map((ev, i) => {
+  const list = document.getElementById("history-list");
+  setEventCount(events.length);
+  if (!events.length) {
+    list.innerHTML = `<div class="history-item"><div class="history-note" style="margin-left: 0;">開催の記録はまだありません。</div></div>`;
+    return;
+  }
+  list.innerHTML = events.map((ev, i) => {
     const d = parseDate(ev.date);
     if (!d) return "";
     return `
@@ -902,7 +958,10 @@ function renderHistory(events) {
 }
 
 // ---------- リンク 描画 ----------
-function renderLinks(links) {
+function renderLinks(chouseiUrl) {
+  const links = CONFIG.links
+    .map(l => ({ ...l, url: l.style === "chousei" ? chouseiUrl : l.url }))
+    .filter(l => safeUrl(l.url));
   document.getElementById("link-grid").innerHTML = links.map(l => `
     <a class="link-card ${l.style} reveal" href="${safeUrl(l.url)}" target="_blank" rel="noopener">
       <div><h4>${esc(l.title)}</h4><p>${esc(l.desc)}</p></div>
@@ -911,20 +970,48 @@ function renderLinks(links) {
   observeReveals();
 }
 
-// ---------- まずフォールバック(CONFIG内のデータ)で描画 ----------
-renderNext(CONFIG.nextEvent);
-renderHistory(CONFIG.pastEvents);
-renderLinks(CONFIG.links);
+// ---------- 読み込み中の表示 ----------
+function renderLoading() {
+  document.getElementById("next-card").innerHTML = `
+    <div class="next-info" style="grid-column: 1 / -1; text-align: center;">
+      <div class="meta">開催情報を読み込んでいます…</div>
+    </div>`;
+  document.getElementById("history-list").innerHTML =
+    `<div class="history-item"><div class="history-note" style="margin-left: 0;">読み込んでいます…</div></div>`;
+}
+
+// ---------- シート読み込み失敗時の表示 ----------
+// ダミーや古い調整さんは出さず、確実に最新情報がある掲示板へ案内する
+function renderLoadError() {
+  document.getElementById("next-card").innerHTML = `
+    <div class="next-info" style="grid-column: 1 / -1; text-align: center;">
+      <div class="place">開催情報を読み込めませんでした</div>
+      <div class="meta">ページを再読み込みしてください。表示されない場合は、掲示板の告知で日程を確認できます。</div>
+      <div style="margin-top: 20px; display: flex; justify-content: center;">
+        <a class="btn btn-navy" href="${boardUrl()}" target="_blank" rel="noopener">掲示板を開く <span class="circ">→</span></a>
+      </div>
+    </div>`;
+  document.getElementById("history-list").innerHTML =
+    `<div class="history-item"><div class="history-note" style="margin-left: 0;">過去の開催を読み込めませんでした。</div></div>`;
+  const stats = document.querySelector(".stats");
+  if (stats) stats.style.display = "none";
+}
+
+// ---------- リンク欄はまず掲示板だけ描画(調整さんは次回開催が読めてから) ----------
+renderLinks("");
 
 /* ============================================================
    Googleスプレッドシート読み込み (A案)
    - gviz API (公開シートをJSONで取得できるGoogleの仕組み) を使用
    - 「開催予定」タブ: 日付が今日以降 → NEXT GAME / 過去 → HISTORY に自動振り分け
-   - 読み込み失敗時は上のフォールバック表示のまま (サイトは壊れない)
+   - 読み込み中は「読み込んでいます」、失敗時は掲示板・調整さんへの案内を表示
+   - CONFIG内のデータは、シートIDが空のとき(手元での確認用)だけ使う
    ============================================================ */
 async function fetchTab(sheetId, tabName) {
   const url = `https://docs.google.com/spreadsheets/d/${encodeURIComponent(sheetId)}/gviz/tq?tqx=out:json&headers=1&sheet=${encodeURIComponent(tabName)}`;
-  const res = await fetch(url);
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), 10000);
+  const res = await fetch(url, { signal: ctrl.signal }).finally(() => clearTimeout(timer));
   if (!res.ok) throw new Error(`シート取得失敗: ${res.status}`);
   const text = await res.text();
   // gvizのレスポンスは関数呼び出しで包まれているので、中身のJSONだけ取り出す
@@ -937,26 +1024,31 @@ async function fetchTab(sheetId, tabName) {
 
 (async function loadFromSheet() {
   const s = CONFIG.sheet;
-  if (!s || !s.id) return; // ID未設定ならフォールバックのまま
+  if (!s || !s.id) {
+    // シートID未設定のときだけ CONFIG 内のデータで表示
+    showNext(CONFIG.nextEvent);
+    renderHistory(CONFIG.pastEvents);
+    return;
+  }
+  renderLoading();
   try {
     const events = await fetchTab(s.id, s.eventsTab);
-
-    if (events.length) {
-      const today = new Date(); today.setHours(0, 0, 0, 0);
-      const parsed = events.map(r => ({
-        date: r["日付"], d: parseDate(r["日付"]),
-        startTime: r["開始"], endTime: r["終了"],
-        place: r["会場"], access: r["アクセス"],
-        mapUrl: r["地図URL"], chouseisanUrl: r["調整さんURL"],
-        note: r["メモ"]
-      })).filter(e => e.d);
-      const future = parsed.filter(e => e.d >= today).sort((a, b) => a.d - b.d);
-      const past = parsed.filter(e => e.d < today).sort((a, b) => b.d - a.d);
-      renderNext(future[0] || null);
-      if (past.length) renderHistory(past);
-    }
+    const today = new Date(); today.setHours(0, 0, 0, 0);
+    const parsed = events.map(r => ({
+      date: r["日付"], d: parseDate(r["日付"]),
+      startTime: r["開始"], endTime: r["終了"],
+      place: r["会場"], access: r["アクセス"],
+      mapUrl: r["地図URL"], chouseisanUrl: r["調整さんURL"],
+      note: r["メモ"],
+      meet: r["集合"], fee: r["参加費"], party: r["懇親会"], noticeUrl: r["告知URL"]
+    })).filter(e => e.d);
+    const future = parsed.filter(e => e.d >= today).sort((a, b) => a.d - b.d);
+    const past = parsed.filter(e => e.d < today).sort((a, b) => b.d - a.d);
+    showNext(future[0] || null);
+    renderHistory(past);
   } catch (e) {
-    console.warn("シート読み込みに失敗したため、埋め込みデータを表示しています:", e);
+    console.warn("シート読み込みに失敗しました:", e);
+    renderLoadError();
   }
 })();
 
@@ -983,10 +1075,10 @@ const ioCount = new IntersectionObserver(entries => {
   entries.forEach(e => {
     if (!e.isIntersecting) return;
     ioCount.unobserve(e.target);
-    const target = +e.target.dataset.target;
     const dur = 1200, t0 = performance.now();
     (function tick(t) {
       const p = Math.min((t - t0) / dur, 1);
+      const target = +e.target.dataset.target;  // シート読み込み後に件数が変わっても追従する
       e.target.textContent = Math.round(target * (1 - Math.pow(1 - p, 3)));
       if (p < 1) requestAnimationFrame(tick);
     })(t0);
