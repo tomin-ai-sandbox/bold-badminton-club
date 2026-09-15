@@ -737,8 +737,8 @@ body {
         <span class="t">出欠登録<small>日程は掲示板で告知します</small></span>
         <span class="circ">→</span>
       </a>
-      <a class="cta-board" href="https://portal.bold.ne.jp/wiki/detail/16886" target="_blank" rel="noopener">
-        <span class="t">社内掲示板<small>活動報告・告知はこちら</small></span>
+      <a class="cta-board" data-board href="https://portal.bold.ne.jp/wiki/detail/16886" target="_blank" rel="noopener">
+        <span class="t">社内掲示板<small>最新の告知・活動報告はこちら</small></span>
         <span class="circ">→</span>
       </a>
     </div>
@@ -816,9 +816,9 @@ const CONFIG = {
   // ---- 外部リンク ----
   links: [
     {
-      title: "活動報告・活動告知はこちら",
-      desc: "最新の活動報告や告知は社内ポータルの掲示板で発信しています。",
-      url: "https://portal.bold.ne.jp/wiki/detail/16886",  // 社内ポータル掲示板
+      title: "最新の告知・活動報告",
+      desc: "社内ポータルに載せた、いちばん新しい告知か活動報告を開きます。",
+      url: "https://portal.bold.ne.jp/wiki/detail/16886",  // シートが読めないときだけ使う予備のURL
       style: "board"
     },
     {
@@ -905,7 +905,10 @@ function renderNext(ev) {
 }
 
 // ---------- 掲示板のURL ----------
+// シートから見つけた最新の告知・報告記事(次回の告知URL > 直近の報告URL > 直近の告知URL)
+let latestArticleUrl = "";
 function boardUrl() {
+  if (latestArticleUrl) return latestArticleUrl;
   const board = CONFIG.links.find(l => l.style === "board");
   return safeUrl(board ? board.url : "");
 }
@@ -914,6 +917,7 @@ function boardUrl() {
 // 次回の調整さんURLがないときは掲示板へ飛ばし、右下バナーは隠す
 function updateChouseiLinks(url) {
   document.querySelectorAll("[data-chousei]").forEach(a => { a.href = url || boardUrl(); });
+  document.querySelectorAll("[data-board]").forEach(a => { a.href = boardUrl(); });
   const small = document.querySelector(".cta-chousei small");
   if (small) small.textContent = url ? "調整さんはこちら" : "日程は掲示板で告知します";
   const banner = document.querySelector(".fixed-reserve");
@@ -960,7 +964,7 @@ function renderHistory(events) {
 // ---------- リンク 描画 ----------
 function renderLinks(chouseiUrl) {
   const links = CONFIG.links
-    .map(l => ({ ...l, url: l.style === "chousei" ? chouseiUrl : l.url }))
+    .map(l => ({ ...l, url: l.style === "chousei" ? chouseiUrl : (l.style === "board" ? boardUrl() : l.url) }))
     .filter(l => safeUrl(l.url));
   document.getElementById("link-grid").innerHTML = links.map(l => `
     <a class="link-card ${l.style} reveal" href="${safeUrl(l.url)}" target="_blank" rel="noopener">
@@ -1040,10 +1044,13 @@ async function fetchTab(sheetId, tabName) {
       place: r["会場"], access: r["アクセス"],
       mapUrl: r["地図URL"], chouseisanUrl: r["調整さんURL"],
       note: r["メモ"],
-      meet: r["集合"], fee: r["参加費"], party: r["懇親会"], noticeUrl: r["告知URL"]
+      meet: r["集合"], fee: r["参加費"], party: r["懇親会"], noticeUrl: r["告知URL"], reportUrl: r["報告URL"]
     })).filter(e => e.d);
     const future = parsed.filter(e => e.d >= today).sort((a, b) => a.d - b.d);
     const past = parsed.filter(e => e.d < today).sort((a, b) => b.d - a.d);
+    const latestPast = past.find(e => safeUrl(e.reportUrl) || safeUrl(e.noticeUrl));
+    latestArticleUrl = safeUrl(future[0] && future[0].noticeUrl)
+      || (latestPast ? (safeUrl(latestPast.reportUrl) || safeUrl(latestPast.noticeUrl)) : "");
     showNext(future[0] || null);
     renderHistory(past);
   } catch (e) {
