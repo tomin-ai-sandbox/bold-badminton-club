@@ -523,6 +523,7 @@ body {
 }
 .link-card.board::before { background: var(--navy); }
 .link-card.chousei::before { background: var(--green); }
+.link-card.match::before { background: var(--yellow); }
 .link-card h4 { font-size: 1.2rem; font-weight: 900; margin-bottom: 8px; }
 .link-card p { font-size: 0.84rem; color: #5A6068; }
 .link-card .go {
@@ -724,7 +725,7 @@ body {
   <span class="v-label">LINKS</span>
   <div class="section-inner">
     <div class="sec-head reveal">
-      <h2 class="sec-title">活動報告・出欠</h2>
+      <h2 class="sec-title">よく使うリンク</h2>
     </div>
     <div class="link-grid" id="link-grid">
       <!-- JSにより CONFIG.links から描画 -->
@@ -831,6 +832,12 @@ const CONFIG = {
       desc: "次回の出欠はこちらから。参加・不参加どちらでも入力お願いします!",
       url: "",  // 空のままでOK(次回開催の「調整さんURL」を自動で使う)
       style: "chousei"
+    },
+    {
+      title: "試合の組み合わせ",
+      desc: "当日のダブルスの向き合わせ表です。はじめての人は「ゲストとして入場」から。",
+      url: "https://daaki-dotcom.github.io/badminton-match-manager/",  // 部員が作成した試合管理アプリ(別サイト)
+      style: "match"
     }
   ]
 };
