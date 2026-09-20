@@ -492,6 +492,28 @@ body {
 }
 .history-place { font-weight: 700; font-size: 0.95rem; color: var(--ink); }
 .history-note { font-size: 0.78rem; color: var(--muted); margin-left: auto; }
+/* 6件目以降の折りたたみ */
+.history-rest[hidden] { display: none; }
+.history-more {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
+  margin-top: 20px;
+  padding: 18px 20px;
+  background: transparent;
+  border: 1px solid var(--line);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 0.88rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: background 0.3s, border-color 0.3s;
+}
+.history-more:hover { background: #FFF; border-color: var(--ink); }
+.history-more-count { font-size: 0.76rem; font-weight: 500; color: var(--muted); }
 
 /* ---------- LINKS (白・角なしカード) ---------- */
 .link-grid {
@@ -647,8 +669,8 @@ body {
   <nav class="gnav">
     <a href="#next">次回の開催</a>
     <a href="#about">部活紹介</a>
-    <a href="#history">過去の開催</a>
     <a href="#links">リンク</a>
+    <a href="#history">過去の開催</a>
     <a class="nav-cta" data-chousei href="https://portal.bold.ne.jp/wiki/detail/16886" target="_blank" rel="noopener">出欠登録</a>
   </nav>
 </header>
@@ -707,21 +729,8 @@ body {
   </div>
 </section>
 
-<!-- ============ HISTORY (深いクリーム) ============ -->
-<section class="section is-deep" id="history">
-  <span class="v-label">HISTORY</span>
-  <div class="section-inner">
-    <div class="sec-head reveal">
-      <h2 class="sec-title">過去の開催場所</h2>
-    </div>
-    <div class="history-list" id="history-list">
-      <!-- JSにより CONFIG.pastEvents から描画 -->
-    </div>
-  </div>
-</section>
-
-<!-- ============ LINKS (白) ============ -->
-<section class="section" id="links">
+<!-- ============ LINKS (深いクリーム) ============ -->
+<section class="section is-deep" id="links">
   <span class="v-label">LINKS</span>
   <div class="section-inner">
     <div class="sec-head reveal">
@@ -729,6 +738,19 @@ body {
     </div>
     <div class="link-grid" id="link-grid">
       <!-- JSにより CONFIG.links から描画 -->
+    </div>
+  </div>
+</section>
+
+<!-- ============ HISTORY (明るいクリーム・番号付きリスト) ============ -->
+<section class="section" id="history">
+  <span class="v-label">HISTORY</span>
+  <div class="section-inner">
+    <div class="sec-head reveal">
+      <h2 class="sec-title">過去の開催場所</h2>
+    </div>
+    <div class="history-list" id="history-list">
+      <!-- JSにより CONFIG.pastEvents から描画(先頭5件 + 折りたたみ) -->
     </div>
   </div>
 </section>
@@ -952,6 +974,24 @@ function setEventCount(n) {
 }
 
 // ---------- 過去の開催 描画 ----------
+// 最初に見せる件数。ここを変えれば折りたたみの境目が変わる
+const HISTORY_VISIBLE = 5;
+
+// 1行分のHTMLを作る。折りたたみの中身には reveal を付けない
+// (reveal は画面に入ったら表示するアニメーション。非表示の要素に付けると
+//  開いたときに透明のままになることがあるため)
+function historyItemHtml(ev, i, withReveal) {
+  const d = parseDate(ev.date);
+  if (!d) return "";
+  return `
+    <div class="history-item${withReveal ? " reveal" : ""}">
+      <div class="history-no">${String(i + 1).padStart(2, "0")}</div>
+      <div class="history-date">${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, "0")}.${String(d.getDate()).padStart(2, "0")}</div>
+      <div class="history-place">${esc(ev.place)}</div>
+      <div class="history-note">${esc(ev.note)}</div>
+    </div>`;
+}
+
 function renderHistory(events) {
   const list = document.getElementById("history-list");
   setEventCount(events.length);
@@ -959,17 +999,35 @@ function renderHistory(events) {
     list.innerHTML = `<div class="history-item"><div class="history-note" style="margin-left: 0;">開催の記録はまだありません。</div></div>`;
     return;
   }
-  list.innerHTML = events.map((ev, i) => {
-    const d = parseDate(ev.date);
-    if (!d) return "";
-    return `
-    <div class="history-item reveal">
-      <div class="history-no">${String(i + 1).padStart(2, "0")}</div>
-      <div class="history-date">${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, "0")}.${String(d.getDate()).padStart(2, "0")}</div>
-      <div class="history-place">${esc(ev.place)}</div>
-      <div class="history-note">${esc(ev.note)}</div>
-    </div>`;
-  }).join("");
+
+  const head = events.slice(0, HISTORY_VISIBLE).map((ev, i) => historyItemHtml(ev, i, true)).join("");
+  const restCount = Math.max(0, events.length - HISTORY_VISIBLE);
+  const rest = events.slice(HISTORY_VISIBLE).map((ev, i) => historyItemHtml(ev, i + HISTORY_VISIBLE, false)).join("");
+  const closedLabel = `さらに表示する<span class="history-more-count">残り${restCount}件</span>`;
+
+  // 6件目以降が無いときはボタンごと出さない
+  list.innerHTML = head + (restCount ? `
+    <div class="history-rest" id="history-rest" hidden>${rest}</div>
+    <button class="history-more" id="history-more" type="button" aria-expanded="false" aria-controls="history-rest">${closedLabel}</button>` : "");
+
+  const btn = document.getElementById("history-more");
+  if (btn) {
+    btn.addEventListener("click", () => {
+      const restEl = document.getElementById("history-rest");
+      const isOpen = !restEl.hasAttribute("hidden");
+      if (isOpen) {
+        restEl.setAttribute("hidden", "");
+        btn.setAttribute("aria-expanded", "false");
+        btn.innerHTML = closedLabel;
+        // 閉じたときに画面がページ下部に取り残されないよう、見出しに戻す
+        document.getElementById("history").scrollIntoView({ behavior: "smooth", block: "start" });
+      } else {
+        restEl.removeAttribute("hidden");
+        btn.setAttribute("aria-expanded", "true");
+        btn.textContent = "閉じる";
+      }
+    });
+  }
   observeReveals();
 }
 
